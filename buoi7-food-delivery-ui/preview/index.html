@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Food Delivery UI - Buổi 7 React Native Preview</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      color: #1E293B;
+    }
+
+    /* Khung Device Phone Giả Lập */
+    .phone-wrapper {
+      width: 100%;
+      max-width: 412px;
+      height: 870px;
+      background: #000000;
+      border-radius: 48px;
+      padding: 12px;
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.1);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Màn hình hiển thị React Native */
+    .phone-screen {
+      width: 100%;
+      height: 100%;
+      background: #F8FAFC;
+      border-radius: 38px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* Status Bar + Tai thỏ (SafeAreaView mô phỏng) */
+    .status-bar {
+      height: 44px;
+      background: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #0F172A;
+      position: relative;
+      z-index: 100;
+      border-bottom: 1px solid rgba(0,0,0,0.02);
+    }
+
+    .dynamic-island {
+      position: absolute;
+      left: 50%;
+      top: 9px;
+      transform: translateX(-50%);
+      width: 110px;
+      height: 26px;
+      background: #000000;
+      border-radius: 20px;
+    }
+
+    /* 1. Header Cố Định (Fixed Header) */
+    .fixed-header {
+      background: #FFFFFF;
+      padding: 10px 0 10px 0;
+      border-bottom: 1px solid #F1F5F9;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      z-index: 50;
+      flex-shrink: 0;
+    }
+
+    .top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 16px;
+      margin-bottom: 10px;
+    }
+
+    .location-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: #94A3B8;
+      letter-spacing: 0.5px;
+    }
+
+    .location-selector {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 2px;
+      cursor: pointer;
+    }
+
+    .location-address {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #0F172A;
+      max-width: 240px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .cart-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 21px;
+      background: #FFF7ED;
+      border: 1px solid #FED7AA;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      cursor: pointer;
+      transition: transform 0.15s ease;
+    }
+
+    .cart-btn:active {
+      transform: scale(0.92);
+    }
+
+    .cart-badge {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      background: #EA580C;
+      color: #FFFFFF;
+      font-size: 10px;
+      font-weight: 800;
+      min-width: 18px;
+      height: 18px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 4px;
+      border: 1.5px solid #FFFFFF;
+    }
+
+    /* Thanh tìm kiếm */
+    .search-box {
+      margin: 0 16px 10px 16px;
+      background: #F1F5F9;
+      border-radius: 12px;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      gap: 8px;
+    }
+
+    .search-box input {
+      border: none;
+      background: transparent;
+      outline: none;
+      width: 100%;
+      font-size: 13.5px;
+      font-family: inherit;
+      color: #1E293B;
+    }
+
+    .search-box input::placeholder {
+      color: #94A3B8;
+    }
+
+    /* Category Chips Scroll */
+    .category-scroll {
+      display: flex;
+      gap: 8px;
+      padding: 2px 16px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .category-scroll::-webkit-scrollbar {
+      display: none;
+    }
+
+    .cat-chip {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 13px;
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      border-radius: 20px;
+      white-space: nowrap;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #475569;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .cat-chip.active {
+      background: #EA580C;
+      border-color: #EA580C;
+      color: #FFFFFF;
+    }
+
+    /* 2. FlatList Container (Cuộn danh sách) */
+    .flatlist-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 16px 28px 16px;
+      scrollbar-width: none;
+    }
+
+    .flatlist-content::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* Banner Promo */
+    .promo-banner {
+      background: linear-gradient(135deg, #7C2D12 0%, #9A3412 100%);
+      border-radius: 16px;
+      padding: 16px;
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+      box-shadow: 0 8px 16px -4px rgba(234, 88, 12, 0.25);
+    }
+
+    .promo-tag {
+      font-size: 10px;
+      font-weight: 800;
+      color: #FED7AA;
+      letter-spacing: 0.6px;
+      margin-bottom: 4px;
+    }
+
+    .promo-title {
+      font-size: 15px;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .promo-sub {
+      font-size: 11px;
+      color: #FDBA74;
+    }
+
+    .promo-btn {
+      background: #EA580C;
+      color: #FFFFFF;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+    }
+
+    /* Section Header */
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: 17px;
+      font-weight: 800;
+      color: #0F172A;
+    }
+
+    .item-count {
+      font-size: 12.5px;
+      color: #64748B;
+      font-weight: 600;
+    }
+
+    /* Component FoodItem */
+    .food-card {
+      display: flex;
+      background: #FFFFFF;
+      border-radius: 16px;
+      padding: 12px;
+      margin-bottom: 14px;
+      border: 1px solid #F1F5F9;
+      box-shadow: 0 3px 10px rgba(15, 23, 42, 0.05);
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .food-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 14px rgba(15, 23, 42, 0.08);
+    }
+
+    .food-card:active {
+      transform: scale(0.985);
+    }
+
+    .food-img-wrap {
+      width: 105px;
+      height: 105px;
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+      flex-shrink: 0;
+      background: #F8FAFC;
+    }
+
+    .food-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .discount-badge {
+      position: absolute;
+      top: 6px;
+      left: 6px;
+      background: #EF4444;
+      color: #FFFFFF;
+      font-size: 9px;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 6px;
+      letter-spacing: 0.3px;
+    }
+
+    .food-info {
+      flex: 1;
+      margin-left: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .food-name {
+      font-size: 14.5px;
+      font-weight: 700;
+      color: #1E293B;
+      margin-bottom: 3px;
+      line-height: 1.3;
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .food-desc {
+      font-size: 12px;
+      color: #64748B;
+      line-height: 16px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .meta-row {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12px;
+      color: #64748B;
+      margin: 4px 0;
+    }
+
+    .meta-rating {
+      font-weight: 700;
+      color: #D97706;
+    }
+
+    .bottom-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .price-group {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+    }
+
+    .current-price {
+      font-size: 15px;
+      font-weight: 800;
+      color: #EA580C;
+    }
+
+    .orig-price {
+      font-size: 11px;
+      color: #94A3B8;
+      text-decoration: line-through;
+    }
+
+    .add-btn {
+      background: #EA580C;
+      color: #FFFFFF;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.15s ease;
+    }
+
+    .add-btn:hover {
+      background: #C2410C;
+    }
+
+    /* Toast Thông báo */
+    .toast-popup {
+      position: absolute;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(60px);
+      background: rgba(15, 23, 42, 0.95);
+      color: #FFFFFF;
+      padding: 10px 18px;
+      border-radius: 24px;
+      font-size: 13px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 1000;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    .toast-popup.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Modal Chi Tiết Món */
+    .modal-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: flex-end;
+      z-index: 200;
+    }
+
+    .modal-overlay.open {
+      display: flex;
+    }
+
+    .modal-sheet {
+      width: 100%;
+      background: #FFFFFF;
+      border-radius: 28px 28px 0 0;
+      padding: 20px;
+      animation: slideUp 0.25s ease;
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Khung Điện Thoại Di Động Giả Lập -->
+  <div class="phone-wrapper">
+    <div class="phone-screen">
+      
+      <!-- 1. Thanh Status Bar (SafeAreaView mô phỏng) -->
+      <div class="status-bar">
+        <span>9:41</span>
+        <div class="dynamic-island"></div>
+        <span>📶 5G 🔋</span>
+      </div>
+
+      <!-- 2. Header Cố Định (Fixed Header) -->
+      <header class="fixed-header">
+        <div class="top-row">
+          <div>
+            <div class="location-label">GIAO ĐẾN ĐỊA CHỈ</div>
+            <div class="location-selector">
+              <span>📍</span>
+              <span class="location-address">123 Nguyễn Huệ, Phường Bến Nghé, Quận 1</span>
+              <span style="font-size: 9px; color: #64748B;">▼</span>
+            </div>
+          </div>
+
+          <div class="cart-btn" id="cartButton" onclick="openCart()">
+            <span>🛒</span>
+            <div class="cart-badge" id="cartBadge">1</div>
+          </div>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="search-box">
+          <span>🔍</span>
+          <input type="text" id="searchInput" placeholder="Tìm kiếm món ngon, trà sữa, pizza..." oninput="filterFoods()">
+        </div>
+
+        <!-- Category Horizontal Filter Chips -->
+        <div class="category-scroll" id="categoryScroll"></div>
+      </header>
+
+      <!-- 3. FlatList Cuộn Danh Sách -->
+      <main class="flatlist-content" id="foodContainer">
+        <!-- Banner Khuyến Mãi -->
+        <div class="promo-banner">
+          <div>
+            <div class="promo-tag">⚡ FLASH SALE HÔM NAY</div>
+            <div class="promo-title">Đồng Giá 39K & Freeship</div>
+            <div class="promo-sub">Áp dụng cho đơn hàng từ 10h - 14h</div>
+          </div>
+          <button class="promo-btn" onclick="showToast('🎉 Đã lưu mã giảm giá 39K!')">Lấy Mã</button>
+        </div>
+
+        <!-- Tiêu đề Section -->
+        <div class="section-header">
+          <div class="section-title">Món Ngon Đề Xuất</div>
+          <div class="item-count" id="itemCount">6 món</div>
+        </div>
+
+        <!-- Danh sách FoodItem Render động -->
+        <div id="foodList"></div>
+      </main>
+
+      <!-- Toast thông báo -->
+      <div class="toast-popup" id="toast">✅ Đã thêm vào giỏ hàng!</div>
+
+      <!-- Modal Chi Tiết Món Ăn -->
+      <div class="modal-overlay" id="detailModal" onclick="closeModal(event)">
+        <div class="modal-sheet" onclick="event.stopPropagation()">
+          <div style="width: 40px; height: 4px; background: #E2E8F0; border-radius: 2px; margin: 0 auto 16px auto;"></div>
+          <img id="modalImg" src="" style="width: 100%; height: 160px; object-fit: cover; border-radius: 16px; margin-bottom: 12px;">
+          <h3 id="modalName" style="font-size: 18px; font-weight: 800; margin-bottom: 6px;"></h3>
+          <p id="modalDesc" style="font-size: 13px; color: #64748B; line-height: 1.5; margin-bottom: 14px;"></p>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div id="modalPrice" style="font-size: 20px; font-weight: 800; color: #EA580C;"></div>
+            <button class="add-btn" style="padding: 10px 20px; font-size: 14px;" onclick="addCurrentModalItem()">+ Thêm vào giỏ</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const CATEGORIES = [
+      { id: 'all', name: 'Tất cả', icon: '🍽️' },
+      { id: 'burger', name: 'Burger', icon: '🍔' },
+      { id: 'pizza', name: 'Pizza', icon: '🍕' },
+      { id: 'chicken', name: 'Gà rán', icon: '🍗' },
+      { id: 'drinks', name: 'Trà sữa', icon: '🧋' },
+      { id: 'noodles', name: 'Mì & Phở', icon: '🍜' },
+    ];
+
+    const FOOD_ITEMS = [
+      {
+        id: 'food_101',
+        name: 'Burger Bò Phô Mai Tan Chảy Double Cheese',
+        category: 'burger',
+        price: 65000,
+        originalPrice: 85000,
+        rating: 4.9,
+        deliveryTime: '20-25 phút',
+        distance: '1.2 km',
+        imageUrl: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=600&q=80',
+        discountBadge: 'GIẢM 20%',
+        description: 'Thịt bò Úc nướng lửa than, 2 lớp phô mai Cheddar béo ngậy kèm sốt đặc biệt.',
+      },
+      {
+        id: 'food_102',
+        name: 'Pizza Hải Sản Pesto Viền Phô Mai',
+        category: 'pizza',
+        price: 189000,
+        originalPrice: 220000,
+        rating: 4.8,
+        deliveryTime: '30-35 phút',
+        distance: '2.5 km',
+        imageUrl: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=600&q=80',
+        discountBadge: 'FREESHIP',
+        description: 'Tôm tươi, mực giòn, sốt ngò tây Pesto xanh mướt thơm lừng cùng phô mai Mozzarella.',
+      },
+      {
+        id: 'food_103',
+        name: 'Gà Rán Giòn Cay Sốt Cay Hàn Quốc',
+        category: 'chicken',
+        price: 79000,
+        originalPrice: 99000,
+        rating: 4.85,
+        deliveryTime: '15-20 phút',
+        distance: '0.8 km',
+        imageUrl: 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=600&q=80',
+        discountBadge: 'BÁN CHẠY',
+        description: 'Đùi gà giòn rụm phủ đẫm sốt cay ngọt truyền thống xứ kim chi, rắc mè rang thơm bùi.',
+      },
+      {
+        id: 'food_104',
+        name: 'Trà Sữa Trân Châu Đường Đen Kem Trứng',
+        category: 'drinks',
+        price: 45000,
+        originalPrice: 55000,
+        rating: 4.95,
+        deliveryTime: '10-15 phút',
+        distance: '0.5 km',
+        imageUrl: 'https://images.unsplash.com/photo-1558857563-b371033873b8?auto=format&fit=crop&w=600&q=80',
+        discountBadge: 'MUA 1 TẶNG 1',
+        description: 'Trà đen đậm vị sữa tươi thanh trùng, trân châu dẻo dai kèm lớp kem trứng khò thơm nức.',
+      },
+      {
+        id: 'food_105',
+        name: 'Phở Bò Tái Nạm Đặc Biệt Hà Nội',
+        category: 'noodles',
+        price: 60000,
+        originalPrice: 70000,
+        rating: 4.7,
+        deliveryTime: '20-25 phút',
+        distance: '1.8 km',
+        imageUrl: 'https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?auto=format&fit=crop&w=600&q=80',
+        discountBadge: 'QUÁN QUEN',
+        description: 'Nước dùng ninh xương 12 tiếng ngọt thanh tự nhiên, thịt bò mềm tan cùng quẩy giòn.',
+      },
+      {
+        id: 'food_106',
+        name: 'Mì Ramen Thịt Chashu Trứng Lòng Đào',
+        category: 'noodles',
+        price: 115000,
+        originalPrice: 135000,
+        rating: 4.88,
+        deliveryTime: '25-30 phút',
+        distance: '3.1 km',
+        imageUrl: 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=600&q=80',
+        discountBadge: 'HOT',
+        description: 'Sợi mì tươi ramen nấu trong súp xương hầm Tonkotsu đậm đà béo ngậy.',
+      },
+    ];
+
+    let currentCategory = 'all';
+    let cartCount = 1;
+    let selectedFood = null;
+
+    function formatVND(num) {
+      return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(num);
+    }
+
+    function initCategories() {
+      const scroll = document.getElementById('categoryScroll');
+      scroll.innerHTML = CATEGORIES.map(c => `
+        <div class="cat-chip ${c.id === currentCategory ? 'active' : ''}" onclick="selectCategory('${c.id}')">
+          <span>${c.icon}</span>
+          <span>${c.name}</span>
+        </div>
+      `).join('');
+    }
+
+    function selectCategory(id) {
+      currentCategory = id;
+      initCategories();
+      filterFoods();
+    }
+
+    function filterFoods() {
+      const q = document.getElementById('searchInput').value.toLowerCase().trim();
+      const list = FOOD_ITEMS.filter(item => {
+        const matchCat = currentCategory === 'all' || item.category === currentCategory;
+        const matchText = item.name.toLowerCase().includes(q) || item.description.toLowerCase().includes(q);
+        return matchCat && matchText;
+      });
+
+      document.getElementById('itemCount').innerText = `${list.length} món`;
+      renderFoods(list);
+    }
+
+    function renderFoods(items) {
+      const container = document.getElementById('foodList');
+      if (items.length === 0) {
+        container.innerHTML = `
+          <div style="text-align: center; padding: 40px 10px;">
+            <div style="font-size: 42px; margin-bottom: 10px;">🔍</div>
+            <div style="font-size: 15px; font-weight: 700; color: #1E293B;">Không tìm thấy món</div>
+            <div style="font-size: 12px; color: #64748B; margin-top: 4px;">Vui lòng thử gõ từ khóa khác.</div>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = items.map(item => `
+        <div class="food-card" onclick="openDetail('${item.id}')">
+          <div class="food-img-wrap">
+            <img src="${item.imageUrl}" alt="${item.name}">
+            ${item.discountBadge ? `<div class="discount-badge">${item.discountBadge}</div>` : ''}
+          </div>
+          <div class="food-info">
+            <div>
+              <div class="food-name">${item.name}</div>
+              <div class="food-desc">${item.description}</div>
+            </div>
+            <div class="meta-row">
+              <span class="meta-rating">⭐ ${item.rating}</span>
+              <span>•</span>
+              <span>${item.deliveryTime}</span>
+              <span>•</span>
+              <span>${item.distance}</span>
+            </div>
+            <div class="bottom-row">
+              <div class="price-group">
+                <span class="current-price">${formatVND(item.price)}</span>
+                ${item.originalPrice ? `<span class="orig-price">${formatVND(item.originalPrice)}</span>` : ''}
+              </div>
+              <button class="add-btn" onclick="addToCart(event, '${item.name}')">+ Thêm</button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function addToCart(e, name) {
+      e.stopPropagation();
+      cartCount++;
+      document.getElementById('cartBadge').innerText = cartCount;
+      showToast(`🛒 Đã thêm "${name}"`);
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.innerText = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2000);
+    }
+
+    function openCart() {
+      showToast(`🛒 Bạn có ${cartCount} món ăn trong giỏ!`);
+    }
+
+    function openDetail(id) {
+      selectedFood = FOOD_ITEMS.find(f => f.id === id);
+      if (!selectedFood) return;
+      document.getElementById('modalImg').src = selectedFood.imageUrl;
+      document.getElementById('modalName').innerText = selectedFood.name;
+      document.getElementById('modalDesc').innerText = selectedFood.description;
+      document.getElementById('modalPrice').innerText = formatVND(selectedFood.price);
+      document.getElementById('detailModal').classList.add('open');
+    }
+
+    function closeModal(e) {
+      document.getElementById('detailModal').classList.remove('open');
+    }
+
+    function addCurrentModalItem() {
+      if (selectedFood) {
+        cartCount++;
+        document.getElementById('cartBadge').innerText = cartCount;
+        showToast(`🛒 Đã thêm "${selectedFood.name}"`);
+        closeModal();
+      }
+    }
+
+    // Khởi tạo
+    initCategories();
+    renderFoods(FOOD_ITEMS);
+  </script>
+</body>
+</html>
